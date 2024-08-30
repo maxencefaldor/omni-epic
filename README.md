@@ -80,7 +80,7 @@ apptainer shell \
 ### Running OMNI-EPIC
 
 ```bash
-python main.py
+python main_omni_epic.py
 ```
 
 ### Human Playable Game
