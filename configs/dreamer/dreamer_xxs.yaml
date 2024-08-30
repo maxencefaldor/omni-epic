@@ -1,0 +1,150 @@
+hydra:
+  job:
+    chdir: True
+  run:
+    dir: ./output/dreamer/${now:%Y-%m-%d_%H%M%S_%f}/
+
+seed: 0
+method: dreamer
+logdir: '.'
+eval_dir: ''
+filter: 'score|length|fps|ratio|train/.*_loss$|train/rand/.*/mean'
+wandb: False
+tensorboard_videos: False
+
+replay:
+  size: 524288
+  online: True
+  fracs: {uniform: 1.0, priority: 0.0, recency: 0.0}
+  prio: {exponent: 0.8, maxfrac: 0.5, initial: inf, zero_on_sample: True}
+  priosignal: model
+  recexp: 1.0
+  chunksize: 1024
+  save_wait: False
+
+jax:
+  platform: gpu
+  jit: True
+  compute_dtype: float32
+  param_dtype: float32
+  prealloc: True
+  checks: False
+  logical_cpus: 0
+  debug: False
+  policy_devices: [0]
+  train_devices: [0]
+  sync_every: 1
+  profiler: False
+  transfer_guard: False
+  assert_num_devices: -1
+  fetch_policy_carry: False
+  nvidia_flags: False
+  xla_dump: False
+
+run:
+  script: train
+  steps: 2097152
+  duration: 0
+  num_envs: 32
+  num_envs_eval: 4
+  expl_until: 0
+  log_every: 120
+  save_every: 900
+  eval_every: 180
+  eval_initial: True
+  eval_eps: 10
+  train_ratio: 32.0
+  train_fill: 0
+  eval_fill: 0
+  log_zeros: True
+  log_keys_video: [image]
+  log_keys_sum: '^$'
+  log_keys_avg: '^$'
+  log_keys_max: '^$'
+  log_video_fps: 60
+  log_video_streams: 1
+  log_episode_timeout: 60
+  from_checkpoint: ''
+  actor_addr: 'tcp://localhost:{auto}'
+  replay_addr: 'tcp://localhost:{auto}'
+  logger_addr: 'tcp://localhost:{auto}'
+  actor_batch: 8
+  actor_threads: 4
+  env_replica: -1
+  ipv6: False
+  usage: {psutil: True, nvsmi: True, gputil: False, malloc: False, gc: False}
+  timer: True
+  driver_parallel: True
+  agent_process: False
+  remote_replay: False
+
+env:
+  path: /workspace/src/omni_epic/envs/r2d2/go_forward.py
+  vision: True
+  size: [32, 32]
+  use_depth: True
+  fov: 90.
+
+wrapper:
+  length: 1000
+  reset: True
+  discretize: 0
+  checks: True
+
+# Agent
+report: True
+report_gradnorms: False
+batch_size: 16
+batch_length: 65
+batch_length_eval: 33
+replay_length: 0
+replay_length_eval: 0
+replay_context: 1
+random_agent: False
+loss_scales: {dec_cnn: 1.0, dec_mlp: 1.0, reward: 1.0, cont: 1.0, dyn: 1.0, rep: 0.1, actor: 1.0, critic: 1.0, replay_critic: 0.3}
+opt: {scaler: rms, lr: 4e-5, eps: 1e-20, momentum: True, wd: 0.0, warmup: 1000, globclip: 0.0, agc: 0.3, beta1: 0.9, beta2: 0.999, details: False, pmin: 1e-3, anneal: 0, schedule: constant}
+ac_grads: none
+reset_context: 0.0
+replay_critic_loss: True
+replay_critic_grad: True
+replay_critic_bootstrap: imag
+reward_grad: True
+report_openl_context: 8
+
+# World Model
+dyn:
+  typ: rssm
+  rssm: {deter: 2048, hidden: 256, stoch: 32, classes: 16, act: silu, norm: rms, unimix: 0.01, outscale: 1.0, winit: normal, imglayers: 2, obslayers: 1, dynlayers: 1, absolute: False, cell: blockgru, blocks: 8}
+enc:
+  spaces: '.*'
+  typ: simple
+  simple: {depth: 16, mults: [1, 2, 4], layers: 3, units: 256, act: silu, norm: rms, winit: normal, symlog: True, outer: False, kernel: 5, minres: 4}
+dec:
+  spaces: '.*'
+  typ: simple
+  simple: {inputs: [deter, stoch], vecdist: symlog_mse, depth: 16, mults: [1, 2, 4], layers: 3, units: 256, act: silu, norm: rms, outscale: 1.0, winit: normal, outer: False, kernel: 5, minres: 4, block_space: 8}
+rewhead: {layers: 1, units: 256, act: silu, norm: rms, dist: symexp_twohot, outscale: 0.0, inputs: [deter, stoch], winit: normal, bins: 255}
+conhead: {layers: 1, units: 256, act: silu, norm: rms, dist: binary, outscale: 1.0, inputs: [deter, stoch], winit: normal}
+contdisc: True
+rssm_loss: {free: 1.0}
+
+# Actor Critic
+actor: {layers: 3, units: 256, act: silu, norm: rms, minstd: 0.1, maxstd: 1.0, outscale: 0.01, unimix: 0.01, inputs: [deter, stoch], winit: normal}
+critic: {layers: 3, units: 256, act: silu, norm: rms, dist: symexp_twohot, outscale: 0.0, inputs: [deter, stoch], winit: normal, bins: 255}
+actor_dist_disc: onehot
+actor_dist_cont: normal
+imag_start: all
+imag_repeat: 1
+imag_length: 15
+imag_unroll: False
+horizon: 333
+return_lambda: 0.95
+return_lambda_replay: 0.95
+slow_critic_update: 1
+slow_critic_fraction: 0.02
+retnorm: {impl: perc, rate: 0.01, limit: 1.0, perclo: 5.0, perchi: 95.0}
+valnorm: {impl: off, rate: 0.01, limit: 1e-8}
+advnorm: {impl: off, rate: 0.01, limit: 1e-8}
+actent: 3e-4
+slowreg: 1.0
+slowtar: False

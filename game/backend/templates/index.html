@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>R2D2 Run Game</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+<style>
+    #gameDisplay {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    #videoContainer {
+        position: relative;
+        width: 640px;
+        height: 480px;
+    }
+    #envDescription, #recordingStatus {
+        width: 200px;
+        padding: 15px;
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        font-size: 16px;
+        text-align: center;
+    }
+    button {
+        margin: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+    #status {
+        margin-top: 20px;
+        font-size: 20px;
+        color: green;
+    }
+</style>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+        var recordButton = document.getElementById('recordButton');
+
+        document.addEventListener('keydown', function(event) {
+            let action = null;
+            if (event.keyCode === 38) {  // Up arrow
+                action = 1;
+            } else if (event.keyCode === 40) {  // Down arrow
+                action = 2;
+            } else if (event.keyCode === 39) {  // Right arrow
+                action = 3;
+            } else if (event.keyCode === 37) {  // Left arrow
+                action = 4;
+            } else if (event.keyCode === 32) {  // Space bar
+                action = 5;
+            }
+            if (action !== null) {
+                socket.emit('action', {action: action});
+            }
+        });
+
+        document.getElementById('resetButton').addEventListener('click', function() {
+            socket.emit('reset');
+        });
+
+        document.getElementById('nextLevelButton').addEventListener('click', function() {
+            socket.emit('next_level');
+            document.getElementById('status').textContent = "Generating next level...";
+        });
+
+        document.getElementById('markSuccessButton').addEventListener('click', function() {
+            socket.emit('mark_success');
+            document.getElementById('status').textContent = "Success Marked!";
+        });
+
+        recordButton.addEventListener('click', function() {
+            if (this.textContent === "Record Actions") {
+                this.textContent = "Stop Recording";
+                socket.emit('start_recording');
+                document.getElementById('recordingStatus').textContent = "Recording...";
+            } else {
+                this.textContent = "Record Actions";
+                socket.emit('stop_recording');
+            }
+        });
+
+        socket.on('not_recording_status', function() {
+            recordButton.textContent = "Record Actions";
+            document.getElementById('recordingStatus').textContent = "Not Recording";
+        });
+
+        socket.on('connected_message', function(data) {
+            document.getElementById('status').textContent = data.message;
+        });
+
+        socket.on('reset_message', function(data) {
+            document.getElementById('status').textContent = data.message;
+        });
+
+        socket.on('next_level_message', function(data) {
+            document.getElementById('status').textContent = data.message;
+        });
+
+        socket.on('level_complete', function(data) {
+            document.getElementById('status').textContent = data.message;
+        });
+
+        socket.on('env_description', function(data) {
+            document.getElementById('envDescription').textContent = "Task: " + data.description;
+        });
+
+        socket.on('reward_update', function(data) {
+            var formattedReward = parseFloat(data.reward).toFixed(1);
+            document.getElementById('rewardDisplay').textContent = "Current Reward: " + formattedReward;
+        });
+
+        socket.on('success_marked', function(data) {
+            document.getElementById('status').textContent = data.message;
+        });
+    });
+</script>
+</head>
+<body>
+<h1>R2D2 Run Game Streaming</h1>
+<div id="gameDisplay">
+    <div id="videoContainer">
+        <img src="{{ url_for('video_feed') }}" alt="Game Stream" style="width:90%;">
+    </div>
+    <div id="rewardDisplay">Current Reward: 0</div>
+    <div id="envDescription"></div>
+</div>
+<button id="resetButton">Reset Level</button>
+<button id="nextLevelButton">Next Level</button>
+<button id="recordButton">Record Actions</button>
+<button id="markSuccessButton">Mark Success</button>
+<div id="status"></div>
+<div id="recordingStatus">Not Recording</div>
+</body>
+</html>

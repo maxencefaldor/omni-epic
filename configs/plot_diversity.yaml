@@ -1,0 +1,32 @@
+hydra:
+  job:
+    chdir: True
+  run:
+    dir: ./output/plot_diversity/${now:%Y-%m-%d_%H%M%S_%f}/
+
+methods:
+  OMNI-EPIC:
+    paths:
+      - /workspace/src/output/pipeline/run_0/archive.jsonl
+      - /workspace/src/output/pipeline/run_1/archive.jsonl
+      - /workspace/src/output/pipeline/run_2/archive.jsonl
+  OMNI-EPIC w/o interestingness:
+    paths:
+      - /workspace/src/output/pipeline/run_0/archive.jsonl
+      - /workspace/src/output/pipeline/run_1/archive.jsonl
+      - /workspace/src/output/pipeline/run_2/archive.jsonl
+  OMNI-EPIC w/o archive:
+    paths:
+      - /workspace/src/output/pipeline/run_0/archive.jsonl
+      - /workspace/src/output/pipeline/run_1/archive.jsonl
+      - /workspace/src/output/pipeline/run_2/archive.jsonl
+
+embedding_method: openai
+downscale_method: pca  # pca or autoenc
+grid_size: 20  # diversity grid size
+file_format: png
+remove_titles: False
+remove_background: False
+remove_axes_labels: False
+add_colorbar: True
+remove_x_labels: False

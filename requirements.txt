@@ -1,0 +1,40 @@
+--find-links https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+
+numpy==1.26.4
+scipy
+jax[cuda12_pip]
+flax
+torch
+tensorflow_probability
+scikit-learn
+pybullet
+gym
+statsmodels
+seaborn
+ipython
+ipykernel
+opencv-python
+moviepy
+imageio
+mediapy
+hydra-core
+wandb
+openai
+anthropic
+google-generativeai
+memory_profiler
+
+# DreamerV3
+ruamel.yaml
+einops
+colored
+
+# Website
+flask
+flask-cors
+flask-socketio
+eventlet
+
+# Visualization
+pyvis
+manim

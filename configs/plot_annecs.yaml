@@ -1,0 +1,42 @@
+hydra:
+  job:
+    chdir: True
+  run:
+    dir: ./output/plot_annecs/${now:%Y-%m-%d_%H%M%S_%f}/
+
+methods:
+  OMNI-EPIC:
+    paths:
+      - /workspace/src/output/pipeline/run_0/archive.jsonl
+      - /workspace/src/output/pipeline/run_1/archive.jsonl
+      - /workspace/src/output/pipeline/run_2/archive.jsonl
+  OMNI-EPIC w/o interestingness:
+    paths:
+      - /workspace/src/output/pipeline/run_0/archive.jsonl
+      - /workspace/src/output/pipeline/run_1/archive.jsonl
+      - /workspace/src/output/pipeline/run_2/archive.jsonl
+  OMNI-EPIC w/o archive:
+    paths:
+      - /workspace/src/output/pipeline/run_0/archive.jsonl
+      - /workspace/src/output/pipeline/run_1/archive.jsonl
+      - /workspace/src/output/pipeline/run_2/archive.jsonl
+
+robot: r2d2
+num_seed_tasks: 3
+train_agent: True
+num_prev_eval_envs: 3
+embedding_method: openai
+metrics_dict_path: ''
+file_format: png
+remove_titles: False
+remove_background: False
+remove_axes_labels: False
+remove_legend: False
+
+model_of_interestingness:
+  num_examples: 10
+  # LLM params
+  client: openai
+  model: gpt-4o-2024-05-13
+  max_tokens: 4096
+  temperature: 0

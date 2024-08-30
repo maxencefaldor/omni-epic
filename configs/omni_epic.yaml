@@ -1,0 +1,78 @@
+hydra:
+  job:
+    chdir: True
+  run:
+    dir: ./output/omni_epic/${now:%Y-%m-%d_%H%M%S_%f}/
+
+defaults:
+  - _self_
+  - dreamer: dreamer_xxs
+
+logdir: '.'
+robot: r2d2
+iterations: 50
+iterate_until_success_gen: False  # (added for the game) only iterate until a successful task is found
+error_max_iterations: 5  # maximum number of iterations to solve compilation errors for a task before giving up
+enable_moi: True  # whether to evaluate interestingness of generated task
+enable_sd: True  # whether to evaluate success on trained task
+train_agent: True  # whether to train the agent
+train_from_ckpt: True  # whether to train the agent from checkpoint
+archive_from_ckpt: ''  # path to the checkpoint to initialize the archive from
+embedding_method: openai
+add_examples: True  # whether to add handcrafted examples to the prompts
+override_vars: {}  # override the variables in the script
+num_episodes_to_visualize_dreamer: 4
+iterate_same_task: False
+use_archive: True  # whether to use the archive when generating tasks
+
+environment_generator:
+  # LLM params
+  client: openai
+  model: gpt-4o-2024-05-13
+  max_tokens: 4096
+  temperature: 0
+
+task_generator:
+  num_examples: 5  # number of examples given in the prompts, -1 means give everything
+  num_failed_examples: 5  # number of failed examples given in the prompts, -1 means give everything
+  num_add_examples: 0  # number of additional examples to add to the code gen prompts
+  enable_moi: True  # whether to include interestingness in task generation
+  # LLM params
+  client: openai
+  model: gpt-4o-2024-05-13
+  max_tokens: 4096
+  temperature: 0
+
+model_of_interestingness:
+  num_examples: 10
+  # LLM params
+  client: openai
+  model: gpt-4o-2024-05-13
+  max_tokens: 4096
+  temperature: 0
+
+success_detector:
+  use_vision: False
+  # VLM params, only used if use_vision is True
+  client: openai
+  model: gpt-4-turbo-2024-04-09
+  max_tokens: 4096
+  temperature: 0
+
+task_iterator:
+  max_iterations: 1
+  num_examples: 5
+  # LLM params
+  client: openai
+  model: gpt-4o-2024-05-13
+  max_tokens: 4096
+  temperature: 0
+
+task_iterator_vision:
+  max_iterations: 1
+  num_examples: 5
+  # VLM params
+  client: openai
+  model: gpt-4-turbo-2024-04-09
+  max_tokens: 4096
+  temperature: 0

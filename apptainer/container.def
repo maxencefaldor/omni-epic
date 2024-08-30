@@ -1,0 +1,57 @@
+Bootstrap: docker
+From: ubuntu:22.04
+
+%help
+	OMNI-EPIC: Open-endedness via Models of human Notions of Interestingness with Environments Programmed in Code
+
+%files
+	apptainer/10_nvidia.json /opt/nvidia/
+
+%environment
+	# System
+	export TZ=Europe/London
+
+	# Activate virtual environment permanently
+	export VIRTUAL_ENV='/venv'
+	export _OLD_VIRTUAL_PATH="$PATH"
+	export PATH="$VIRTUAL_ENV/bin:$PATH"
+
+	# Add /workspace/src/ to PYTHONPATH
+	export PYTHONPATH='/workspace/src'
+
+	# EGL
+	export __EGL_VENDOR_LIBRARY_DIRS='/opt/nvidia'
+
+%post
+	echo "export WANDB_API_KEY=$WANDB_API_KEY" >> $APPTAINER_ENVIRONMENT
+	echo "export OPENAI_API_KEY=$OPENAI_API_KEY" >> $APPTAINER_ENVIRONMENT
+	echo "export ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" >> $APPTAINER_ENVIRONMENT
+	export DEBIAN_FRONTEND=noninteractive
+
+	# Update and install required libraries
+	apt update
+	apt install -y unzip wget git software-properties-common ffmpeg
+	apt install -y build-essential libcairo2-dev libpango1.0-dev
+
+	# Install Python
+	add-apt-repository ppa:deadsnakes/ppa
+	apt install -y python3.11 python3.11-venv python3.11-dev
+
+	# Create a virtual environment
+	python3.11 -m venv /venv
+	. /venv/bin/activate
+	python -m ensurepip
+	pip install --upgrade pip
+
+	# Set up workspace
+	mkdir /workspace/ && cd /workspace/
+
+	# Clone repository to /src/
+	git clone https://github.com/maxencefaldor/omni-epic.git src/ && cd src/
+
+	# Install requirements
+	pip install -r requirements.txt
+
+%runscript
+	# Run main
+	python /workspace/src/main.py "$@"

@@ -1,0 +1,11 @@
+{
+    "codepaths": [
+        "/workspace/src/game/backend/env_codes/cross_bridge.py",
+        "/workspace/src/game/backend/env_codes/cross_lava.py",
+        "/workspace/src/game/backend/env_codes/go_to_box.py",
+        "/workspace/src/game/backend/env_codes/open_door.py"
+    ],
+    "failedgens": [],
+    "failedint": [],
+    "failedtrain": []
+}
