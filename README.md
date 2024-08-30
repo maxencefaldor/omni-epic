@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  <a href="https://https://github.com/xxxxxxx/omni-epic/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge"></a>
+  <a href="https://github.com/maxencefaldor/omni-epic/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge"></a>
   <a href="https://arxiv.org/abs/2405.15568"><img src="https://img.shields.io/badge/arXiv-2405.15568-b31b1b.svg?logo=arxiv&style=for-the-badge"></a>
   <a href="https://omni-epic.vercel.app/"><img src="https://img.shields.io/badge/-Website-%238D6748?style=for-the-badge&logo=Website&logoColor=white"></a>
   <a href="https://x.com/jeffclune/status/1795787632435212732"><img src="https://img.shields.io/badge/twitter-%230077B5.svg?&style=for-the-badge&logo=twitter&logoColor=white&color=00acee"></a>
